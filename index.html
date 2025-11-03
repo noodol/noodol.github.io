@@ -1,12 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Hello World!</title>
-<link rel="stylesheet" href="bluestyle.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chart Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+  <div class="container">
+    <h1>Input to Chart Generator</h1>
 
-<h1>Hello Ridi!</h1>
-<p>I like bread.</p>
+    <form id="dataForm">
+      <label for="xValues">X values (comma-separated):</label>
+      <input type="text" id="xValues" placeholder="e.g. 1,2,3,4,5" required />
+
+      <label for="yValues">Y values (comma-separated):</label>
+      <input type="text" id="yValues" placeholder="e.g. 10,20,15,30,25" required />
+
+      <button type="submit">Generate Chart</button>
+    </form>
+
+    <div id="chart-container">
+      <img id="chart" src="" alt="Generated Chart" style="display:none;" />
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const x = document.getElementById('xValues').value.split(',').map(Number);
+      const y = document.getElementById('yValues').value.split(',').map(Number);
+
+      const response = await fetch('/generate-chart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ x, y })
+      });
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const chart = document.getElementById('chart');
+      chart.src = url;
+      chart.style.display = 'block';
+    });
+  </script>
 </body>
 </html>
